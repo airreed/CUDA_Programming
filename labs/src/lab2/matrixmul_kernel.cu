@@ -90,7 +90,7 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
     Matrix subN = getSubMatrix(N, i, blockCol);
 
     __shared__ float sharedM[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float sharedN[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float sharedN[BLOCK_SIZE][BLOCK_SIZE+1];
 
     if(i * blockDim.x + col < M.width && blockDim.y * blockIdx.y + threadIdx.y < M.height){
       sharedM[row][col] = getElements(subM, row, col);
@@ -110,13 +110,9 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
 
     int counter = 0;
     int j = 0;
-    for(j = 0; j <BLOCK_SIZE; j++) {
+    for(j = 0; j <BLOCK_SIZE+1; j++) {
       valueP = valueP + sharedM[row][j] * sharedN[j][col];
-      counter++;
-      if(sharedM[row][j] != 0.0 && sharedN[j][col] != 0.0) {
-//        printf("valueP: %f\n", valueP);
-      }
-      if(j==1 && row == 0) {
+      if(j==32 && row == 0) {
 //        printf("Loop: sharedM[%d][%d]: %f\n", row, j, sharedM[row][j]);
       }
       
