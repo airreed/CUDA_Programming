@@ -33,32 +33,33 @@
  * source code with only those rights set forth herein.
  */
 
-/* Matrix multiplication: P = M * N.
- * Device code.
- */
-
-#ifndef _MATRIXMUL_KERNEL_H_
-#define _MATRIXMUL_KERNEL_H_
-
-#include <stdio.h>
-#include "matrixmul.h"
+#include <stdlib.h>
+////////////////////////////////////////////////////////////////////////////////
+// export C interface
+extern "C"
+void computeGold( float*, const float*, const float*, unsigned int, unsigned int, unsigned int);
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Simple test kernel for device functionality
-//! @param g_idata  input data in global memory
-//! @param g_odata  output data in global memory
+//! Compute reference data set
+//! C = A * B
+//! @param C          reference data, computed but preallocated
+//! @param A          matrix A as provided to device
+//! @param B          matrix B as provided to device
+//! @param hA         height of matrix A
+//! @param wB         width of matrix B
 ////////////////////////////////////////////////////////////////////////////////
-// Matrix multiplication kernel thread specification
-__global__ void MatrixMulKernel(Matrix M, Matrix N, Matrix P)
+void
+computeGold(float* C, const float* A, const float* B, unsigned int hA, unsigned int wA, unsigned int wB)
 {
-	//Multiply the two matrices
-
-
-
-
-
-
-
+    for (unsigned int i = 0; i < hA; ++i)
+        for (unsigned int j = 0; j < wB; ++j) {
+            double sum = 0;
+            for (unsigned int k = 0; k < wA; ++k) {
+                double a = A[i * wA + k];
+                double b = B[k * wB + j];
+                sum += a * b;
+            }
+            C[i * wB + j] = (float)sum;
+        }
 }
 
-#endif // #ifndef _MATRIXMUL_KERNEL_H_
