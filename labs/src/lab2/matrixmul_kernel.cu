@@ -94,28 +94,23 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
 
     if(i * blockDim.x + col < M.width && blockDim.y * blockIdx.y + threadIdx.y < M.height){
       sharedM[row][col] = getElements(subM, row, col);
-//      printf("sharedM[%d][%d]: %f\n", row, col, sharedM[row][col]);
-      }
-    else
+    }
+    else {
       sharedM[row][col] = 0.0;
+    }
     __syncthreads();
     if(i * blockDim.y + row < N.height && blockDim.x * blockIdx.x + threadIdx.x < N.width){
       sharedN[row][col] = getElements(subN, row, col);
-//      printf("sharedN[%d][%d]: %f\n", row, col, sharedN[row][col]);
     }
-    else
+    else {
       sharedN[row][col] = 0.0;
+    }
 
     __syncthreads();
 
-    int counter = 0;
     int j = 0;
-    for(j = 0; j <BLOCK_SIZE+1; j++) {
+    for(j = 0; j <BLOCK_SIZE; j++) {
       valueP = valueP + sharedM[row][j] * sharedN[j][col];
-      if(j==32 && row == 0) {
-//        printf("Loop: sharedM[%d][%d]: %f\n", row, j, sharedM[row][j]);
-      }
-      
     }
 //    printf("counter: %d, j=%d\n", counter, j);
 
@@ -125,10 +120,6 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
 
   if(( blockDim.y * blockIdx.y + threadIdx.y < P.height) && (blockDim.x * blockIdx.x + threadIdx.x < P.width))
     setElements(subP, row, col, valueP);
-  else {
-//    if(valueP != 0)
-//    printf("valueP: %d\n", valueP);
-  }
 
 }
 

@@ -82,10 +82,10 @@ int main(int argc, char** argv) {
 	{
 		// Allocate and initialize the matrices
     srand(time(NULL));
-//		M  = AllocateMatrix(rand() % 1024, rand() % 1024, 1);
-//	  N  = AllocateMatrix(M.width, rand() % 1024, 1);
-    M = AllocateMatrix(1024, 1024, 1);
-    N = AllocateMatrix(1024, 1024, 1);
+		M  = AllocateMatrix(rand() % 1024, rand() % 1024, 1);
+	  N  = AllocateMatrix(M.width, rand() % 1024, 1);
+//    M = AllocateMatrix(1024, 1024, 1);
+//    N = AllocateMatrix(1024, 1024, 1);
 		P  = AllocateMatrix(M.height, N.width, 0);
 	}
 	else
@@ -117,17 +117,17 @@ int main(int argc, char** argv) {
     
 	printf("GPU computation complete\n");
 	// compute the matrix multiplication on the CPU for comparison
-//	Matrix reference = AllocateMatrix(P.height, P.width, 0);
-//	computeGold(reference.elements, M.elements, N.elements, M.height, M.width, N.width);
+	Matrix reference = AllocateMatrix(P.height, P.width, 0);
+	computeGold(reference.elements, M.elements, N.elements, M.height, M.width, N.width);
         
 	printf("CPU computation complete\n");
 	// in this case check if the result is equivalent to the expected soluion
-//	CUTBoolean res = cutComparefe(reference.elements, P.elements, P.height*P.width, 0.001f);
-//  printf("CPU->result: %f\n", *reference.elements);
-//  printf("CPU->result.height: %d, width: %d\n", reference.height, reference.width);
-//  printf("GPU->result: %f\n", *P.elements);
-//  printf("GPU->result.height: %d, width: %d\n", P.height, P.width);
-//	printf("Test %s\n", (1 == res) ? "PASSED" : "FAILED");
+	CUTBoolean res = cutComparefe(reference.elements, P.elements, P.height*P.width, 0.001f);
+  printf("CPU->result: %f\n", *reference.elements);
+  printf("CPU->result.height: %d, width: %d\n", reference.height, reference.width);
+  printf("GPU->result: %f\n", *P.elements);
+  printf("GPU->result.height: %d, width: %d\n", P.height, P.width);
+	printf("Test %s\n", (1 == res) ? "PASSED" : "FAILED");
 
 	if(argc == 5)
 	{
