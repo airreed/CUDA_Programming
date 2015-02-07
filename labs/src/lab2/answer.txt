@@ -1,4 +1,4 @@
-There are 32 threads can be used simultaneously in GTX680.
+There are 1024 threads in one block can be used simultaneously in GTX680.
 
 My output for resource usage of kernel is shown as below:
 
@@ -15,4 +15,6 @@ When multiple 2 32*32 matrix, shared memory used 32*32*2*4 = 8192 bytes. There
 are another 128 bytes in each matrix used for additional padding row/column to
 avoid the bank conflict. 
 
-
+Each multiprocessor has 2048 threads and each block has 1024 * 1024 size for
+x, y dimension. We only used 33 * 32 size in one block and no more than
+1024/32 blocks in one grid. And mostly it can run 8 * 2048 = 16384 threads. 
