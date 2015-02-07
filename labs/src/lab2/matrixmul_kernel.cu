@@ -83,15 +83,27 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
   int col = threadIdx.x;
 
   int i = 0;
-  // M.width / BLOCK_SIZE may be a integer, we still need to handle
-  // the rest of the computation.
+   /**
+    *  M.width / BLOCK_SIZE may be a integer, we still need to handle
+    *  the rest of the computation.
+    */
   for(i=0; i<(M.width+BLOCK_SIZE-1)/BLOCK_SIZE ; i++) {
     Matrix subM = getSubMatrix(M, blockRow, i);
     Matrix subN = getSubMatrix(N, i, blockCol);
 
+    /** 
+     *  shared memory to store two matrix 
+     *  Add one padding column to each matrix 
+     *  to avoid bank conflict.
+     *  ***** there is another method to avoid
+     *  ***** bank conflict that using transpose matrix
+     *        to change one of the matrix to change the 
+     *        reading step.
+     */
     __shared__ float sharedM[BLOCK_SIZE][BLOCK_SIZE+1];
     __shared__ float sharedN[BLOCK_SIZE+1][BLOCK_SIZE];
 
+    /** if the position is out of the matrix, give it 0.0 */
     if(i * blockDim.x + col < M.width && blockDim.y * blockIdx.y + threadIdx.y < M.height){
       sharedM[row][col] = getElements(subM, row, col);
     }
@@ -112,12 +124,12 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
     for(j = 0; j <BLOCK_SIZE; j++) {
       valueP = valueP + sharedM[row][j] * sharedN[j][col];
     }
-//    printf("counter: %d, j=%d\n", counter, j);
+    /** printf("counter: %d, j=%d\n", counter, j);  */
 
     __syncthreads();
   }
   
-
+  /** if the position of the result matrix is in the edge. set the element */
   if(( blockDim.y * blockIdx.y + threadIdx.y < P.height) && (blockDim.x * blockIdx.x + threadIdx.x < P.width))
     setElements(subP, row, col, valueP);
 
