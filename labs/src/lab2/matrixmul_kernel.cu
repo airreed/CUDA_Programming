@@ -89,8 +89,8 @@ __global__ void MatrixMulKernel(const Matrix M, const Matrix N, Matrix P)
     Matrix subM = getSubMatrix(M, blockRow, i);
     Matrix subN = getSubMatrix(N, i, blockCol);
 
-    __shared__ float sharedM[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float sharedN[BLOCK_SIZE][BLOCK_SIZE+1];
+    __shared__ float sharedM[BLOCK_SIZE][BLOCK_SIZE+1];
+    __shared__ float sharedN[BLOCK_SIZE+1][BLOCK_SIZE];
 
     if(i * blockDim.x + col < M.width && blockDim.y * blockIdx.y + threadIdx.y < M.height){
       sharedM[row][col] = getElements(subM, row, col);
