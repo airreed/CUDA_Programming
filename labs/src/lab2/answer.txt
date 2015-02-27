@@ -18,3 +18,6 @@ avoid the bank conflict.
 Each multiprocessor has 2048 threads and each block has 1024 * 1024 size for
 x, y dimension. We only used 33 * 32 size in one block and no more than
 1024/32 blocks in one grid. And mostly it can run 8 * 2048 = 16384 threads. 
+
+Group member: Weihao Ming, Yuewei Wang, Xueying Wang
+              wml431,      ywb017,      wxp834 
