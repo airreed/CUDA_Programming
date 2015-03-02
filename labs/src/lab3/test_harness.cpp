@@ -88,7 +88,14 @@ int main(int argc, char* argv[])
             ref_2dhisto(input, INPUT_HEIGHT, INPUT_WIDTH, gold_bins);)
 
     /* Include your setup code below (temp variables, function calls, etc.) */
+    size_t size_input = INPUT_HEIGHT * ((INPUT_WIDTH + 128) & 0xFFFFFF80) * sizeof(uint32_t);
+    uint32_t *d_input = (uint32_t*)AllocateDeviceMemory(size_input);
 
+    CopyToDeviceMemory((void*)d_input, (void*)*input, size_input);
+
+    size_t size_pHist = HISTO_HEIGHT * HISTO_WIDTH * sizeof(unsigned int);
+    unsigned int *pHist = (unsigned int*)malloc(HISTO_HEIGHT*HISTO_WIDTH*sizeof(unsigned int));
+    unsigned int *d_pHist = (unsigned int*)AllocateDeviceMemory(size_pHist);
 
 
     /* End of setup code */
@@ -96,10 +103,23 @@ int main(int argc, char* argv[])
     /* This is the call you will use to time your parallel implementation */
     TIME_IT("opt_2dhisto",
             1000,
-            opt_2dhisto( /*Define your own function parameters*/ );)
+            opt_2dhisto(d_input, d_pHist);)
 
     /* Include your teardown code below (temporary variables, function calls, etc.) */
 
+    CopyFromDeviceMemory(pHist,  d_pHist, size_pHist);
+
+    FreeDeviceMemory(d_input);
+    FreeDeviceMemory(d_pHist);
+    
+    for(int i=0; i < HISTO_HEIGHT*HISTO_WIDTH; i++) {
+      if(pHist[i] > 0) {
+        if(pHist[i] > 255) pHist[i] = 255;
+        kernel_bins[i] = pHist[i];
+      }
+    }
+
+    
 
 
     /* End of teardown code */
@@ -108,6 +128,7 @@ int main(int argc, char* argv[])
     for (int i=0; i < HISTO_HEIGHT*HISTO_WIDTH; i++){
         if (gold_bins[i] != kernel_bins[i]){
             passed = 0;
+//            printf("gold[%d]: %d, kernel[%d]: %d\n", i, gold_bins[i], i, kernel_bins[i]);
             break;
         }
     }

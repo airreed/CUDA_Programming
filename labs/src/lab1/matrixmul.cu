@@ -150,6 +150,8 @@ void MatrixMulOnDevice(const Matrix M, const Matrix N, Matrix P)
   Matrix d_M, d_N, d_P;
 
   d_M = AllocateDeviceMatrix(M);
+  printf("d_M.elements: %x, &d_M.elements: %x\nM.elements: %x, M.elements: %x\n", 
+      d_M.elements, &d_M.elements, M.elements, &M.elements);
   CopyToDeviceMatrix(d_M, M);
   d_N = AllocateDeviceMatrix(N);
   CopyToDeviceMatrix(d_N, N);
@@ -173,6 +175,7 @@ Matrix AllocateDeviceMatrix(const Matrix M)
   Matrix Mdevice = M;
   int size = M.width * M.height * sizeof(float);
   cudaMalloc((void**)&Mdevice.elements, size);
+  printf("Mdevice.elements: %x, &Mdevice.elements: %x\n", Mdevice.elements, &Mdevice.elements);
   return Mdevice;
 }
 
@@ -203,6 +206,7 @@ void CopyToDeviceMatrix(Matrix Mdevice, const Matrix Mhost)
   Mdevice.height = Mhost.height;
   Mdevice.width = Mhost.width;
   Mdevice.pitch = Mhost.pitch;
+  printf("Mdevice.elements: %x\n", Mdevice.elements);
   cudaMemcpy(Mdevice.elements, Mhost.elements, size, 
       cudaMemcpyHostToDevice);
 }

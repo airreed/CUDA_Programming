@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 
 	// check if the device result is equivalent to the expected solution
 	CUTBoolean res = cutComparefe(reference.elements, P.elements, size_elements, 0.0001f);
-	printf("Test %s\n", (1 == res) ? "PASSED" : "FAILED");
+//	printf("Test %s\n", (1 == res) ? "PASSED" : "FAILED");
 
 	// output result if output file is requested
 	if(argc == 4)
@@ -159,6 +159,8 @@ Matrix AllocateDeviceMatrix(const Matrix M)
 	Matrix Mdevice = M;
 	int size = M.width * M.height * sizeof(float);
 	cudaMalloc((void**)&Mdevice.elements, size);
+  printf("Mdevice.elements: %x, &Mdevice.elements: %x\n", Mdevice.elements, &Mdevice.elements);
+  fflush(stdout);
 	return Mdevice;
 }
 
