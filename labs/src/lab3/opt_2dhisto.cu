@@ -31,6 +31,15 @@ void opt_2dhisto(uint32_t *d_input, unsigned int *d_pHist)
        transfers must be done outside this function */
 
   naiveHistKernel<<<INPUT_HEIGHT * ((INPUT_WIDTH + 128) & 0xFFFFFF80) / 1024 , 1024>>>(d_input, d_pHist, INPUT_HEIGHT, INPUT_WIDTH);
+  /***
+    * GPU kernel lauch is *asynchronous*, 
+    * it will immediately return to CPU thread 
+    * when CPU called GPU kernel, which means
+    * it will get back to CPU before GPU finish works.
+    * So we need `cudaDeviceSynchronize()` to return the 
+    * actual time of GPU running.
+    */
+  cudaDeviceSynchronize();
 
 }
 
