@@ -142,9 +142,9 @@ endif
 # GENCODE_SM20 := -gencode=arch=compute_20,code=\"sm_20,compute_20\"
 GENCODE_SM30 := -gencode=arch=compute_30,code=\"sm_30,compute_30\"
 
-CXXFLAGS  += $(CXXWARN_FLAGS) $(CXX_ARCH_FLAGS)
-CFLAGS    += $(CWARN_FLAGS) $(CXX_ARCH_FLAGS)
-LINKFLAGS +=
+CXXFLAGS  += $(CXXWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv`
+CFLAGS    += $(CWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv`
+LINKFLAGS += `pkg-config --libs opencv`
 LINK      += $(LINKFLAGS) $(CXX_ARCH_FLAGS)
 
 # This option for Mac allows CUDA applications to work without requiring to set DYLD_LIBRARY_PATH
