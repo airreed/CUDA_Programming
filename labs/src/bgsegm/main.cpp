@@ -11,10 +11,11 @@
 #include <cutil.h>
 
 #include "bg_sub_kernel.h"
-
+#include "util.h"
 
 using namespace cv;
 using namespace std;
+ 
 
 
 Mat frame[6];
@@ -27,6 +28,7 @@ int output = 0;
 char outputPath[30];
 
 void processImages();
+void bg_cpu(const Matrix*, const Matrix, Matrix);
 Matrix AllocateMatrix(int, int , Mat); 
 
 
@@ -60,12 +62,18 @@ int main(int argc, char* argv[]) {
 
 void processImages() {
   Matrix input[6];
+  Matrix cpu_output;
+  cpu_output = AllocateMatrix(frame[0].rows, frame[0].cols, frame[0]);
 
   for(int i=0; i<6; i++) {
     input[i] = AllocateMatrix(frame[i].rows, frame[i].cols,frame[i]);
     frame_d[i] = AllocateDeviceMatrix(input[i]);
     CopyToDeviceMatrix(frame_d[i], input[i]);
   }
+
+  _TIME_("CPU_compute",
+      10000,
+      bg_cpu(input, input[5], cpu_output);)
 
   result = frame[0].clone();
   Matrix tmp_r = AllocateMatrix(result.rows, result.cols, result);
@@ -74,7 +82,9 @@ void processImages() {
   Matrix r_d = AllocateDeviceMatrix(tmp_r);
   CopyToDeviceMatrix(r_d, tmp_r);
 
-  bg_caller(frame_d, frame_d[5], r_d);
+  _TIME_("cuda_compute",
+      10000,
+      bg_caller(frame_d, frame_d[5], r_d);)
 
   CopyFromDeviceMatrix(tmp_r, r_d);
 
@@ -113,4 +123,21 @@ Matrix AllocateMatrix(int height, int width, Mat frame) {
 
   return M;
 }
+
+void bg_cpu(const Matrix M[], const Matrix sub, Matrix output) {
+  int tmp;
+  for(int i=0; i < sub.height; i++) {
+    for(int j=0; j<sub.width; j++) {
+      tmp = 0;
+      for(int m=0; m<5; m++) {
+        tmp += M[m].elements[j * sub.width + i];
+      }
+      tmp = tmp/5;
+      float diff = sub.elements[j * sub.width + i] - tmp;
+
+      output.elements[j * sub.width + i] = 0;
+    }
+  }
+}
+
   

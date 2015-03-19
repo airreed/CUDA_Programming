@@ -142,8 +142,8 @@ endif
 # GENCODE_SM20 := -gencode=arch=compute_20,code=\"sm_20,compute_20\"
 GENCODE_SM30 := -gencode=arch=compute_30,code=\"sm_30,compute_30\"
 
-CXXFLAGS  += $(CXXWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv`
-CFLAGS    += $(CWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv`
+CXXFLAGS  += $(CXXWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv` -static
+CFLAGS    += $(CWARN_FLAGS) $(CXX_ARCH_FLAGS) `pkg-config --cflags opencv` -static
 LINKFLAGS += `pkg-config --libs opencv`
 LINK      += $(LINKFLAGS) $(CXX_ARCH_FLAGS)
 

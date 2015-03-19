@@ -18,7 +18,7 @@ __global__ void naiveBackgroundSubstraction(const Matrix M[], const Matrix sub,
 
   if(x >= sub.width || y >= sub.height) return;
 
-  int tmp;
+  int tmp = 0;
   for(int i=0; i<5; i++) {
     tmp += M[i].elements[y * sub.width + x];
   }
@@ -38,8 +38,9 @@ void bg_caller(const Matrix M[], const Matrix sub,  Matrix result) {
   dim3 dimBlock(32, 32);
   dim3 dimGrid(ceil(sub.width / dimBlock.x), ceil(sub.height / dimBlock.y));
  
-  printf("dimGrid.x: %d, dimGrid.y: %d\n", dimGrid.x, dimGrid.y);
+//  printf("dimGrid.x: %d, dimGrid.y: %d\n", dimGrid.x, dimGrid.y);
   naiveBackgroundSubstraction<<<dimGrid, dimBlock>>>(M, sub,  result);
+  cudaDeviceSynchronize();
 }    
 
 Matrix AllocateDeviceMatrix(const Matrix M) {
