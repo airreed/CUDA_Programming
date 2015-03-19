@@ -23,14 +23,21 @@ Mat result;
 
 Matrix frame_d[6];
 
+int output = 0;
+char outputPath[30];
+
 void processImages();
 Matrix AllocateMatrix(int, int , Mat); 
 
 
 int main(int argc, char* argv[]) {
-  if(argc != 7) {
+  if(argc < 7 || argc >= 9) {
     cerr << "USAGE: ./bgsg backgroundfile1...5 substractionfile\n" << endl;
     return EXIT_FAILURE;
+  }
+  else if(argc == 8) {
+    output = 1;
+    strcpy( outputPath, argv[7]);
   }
 
   namedWindow("Background");
@@ -76,6 +83,9 @@ void processImages() {
       result.at<uchar>(y,x) = tmp_r.elements[y * tmp_r.width + x];
     }
   }
+  if(output == 1) {
+    imwrite(outputPath, result);
+  }
   cout << "tmp_r.height: " << tmp_r.height << "---";
   cout << "tmp_r.width: " << tmp_r.width << endl;
   cout << "Result.rows: " << result.rows << "---";
@@ -83,6 +93,7 @@ void processImages() {
   imshow("Background", frame[0]);
   imshow("Original", frame[5]);
   imshow("Result", result);
+
 
   waitKey(0);
 }
