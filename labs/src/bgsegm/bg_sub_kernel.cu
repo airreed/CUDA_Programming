@@ -18,7 +18,7 @@ __global__ void naiveBackgroundSubstraction(const Matrix M[], const Matrix sub,
 
   if(x >= sub.width || y >= sub.height) return;
 
-  int tmp = 0;
+  int tmp;
   for(int i=0; i<5; i++) {
     tmp += M[i].elements[y * sub.width + x];
   }

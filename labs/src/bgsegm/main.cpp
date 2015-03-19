@@ -63,13 +63,13 @@ int main(int argc, char* argv[]) {
 void processImages() {
   Matrix input[6];
   Matrix cpu_output;
-  cpu_output = AllocateMatrix(frame[0].rows, frame[0].cols, frame[0]);
 
   for(int i=0; i<6; i++) {
     input[i] = AllocateMatrix(frame[i].rows, frame[i].cols,frame[i]);
     frame_d[i] = AllocateDeviceMatrix(input[i]);
     CopyToDeviceMatrix(frame_d[i], input[i]);
   }
+  cpu_output = AllocateMatrix(frame[0].rows, frame[0].cols, frame[0]);
 
   _TIME_("CPU_compute",
       10000,
@@ -85,6 +85,7 @@ void processImages() {
   _TIME_("cuda_compute",
       10000,
       bg_caller(frame_d, frame_d[5], r_d);)
+     
 
   CopyFromDeviceMatrix(tmp_r, r_d);
 
